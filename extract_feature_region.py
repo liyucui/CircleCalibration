@@ -28,7 +28,8 @@ def detect_IR_circle(cimage):
             dst_circles1.append(circles[i, :])
 
     if len(dst_circles1) == 4:
-        dst_circles2 = dst_circles1
+        hollow_coord = dst_circles1
+        return hollow_coord
     else:
         for i in dst_circles1[:]:
             if i[1] > 200 and i[0] > 200 and i[1] < cimage.shape[0] * 0.9 and i[0] < cimage.shape[1] * 0.9:
@@ -36,53 +37,58 @@ def detect_IR_circle(cimage):
             else:
                 pass
 
-    if len(dst_circles2)== 5:
-        data = np.array(dst_circles2)
-        idex = np.lexsort([data[:, 0]])
-        sorted_data = data[idex, :]
-        sorted_data1 = sorted_data[0:3]
+        if len(dst_circles2) == 6:
+            arr_dst_circles2 = np.array(dst_circles2)
+            dst_matrix = spatial.distance_matrix(arr_dst_circles2, arr_dst_circles2)
+            min_dst = 99999
+            index_i = 0
+            index_y = 0
+            for i in range(dst_matrix.shape[0]):
+                for j in range(dst_matrix.shape[1]):
+                    if dst_matrix[i][j] == 0:
+                        pass
+                    elif dst_matrix[i][j] < min_dst:
+                        index_i = i
+                        index_y = j
+                        min_dst = dst_matrix[i][j]
+                    else:
+                        pass
 
-        idex1 = np.lexsort([sorted_data1[:, 1]])
-        sorted_data2 = sorted_data1[idex1, :]
-        to_del = sorted_data2[1]
-
-        for i in dst_circles2[:]:
-            if i[0]==to_del[0] and i[1]==to_del[1] and i[2]==to_del[2]:
-                pass
-            else:
-                dst_circles3.append(i[:])
-        hollow_coord = dst_circles3[:]
-    elif len(dst_circles2) == 4:
-        for i in dst_circles2[:]:
-            hollow_coord.append(i[:])
-    elif len(dst_circles2) == 6:
-        arr_dst_circles2 = np.array(dst_circles2)
-        dst_matrix = spatial.distance_matrix(arr_dst_circles2, arr_dst_circles2)
-        min_dst = 99999
-        index_i = 0
-        index_y = 0
-        for i in range(dst_matrix.shape[0]):
-            for j in range(dst_matrix.shape[1]):
-                if dst_matrix[i][j] == 0:
+            for k in range(6):
+                if k == index_y or k == index_i:
                     pass
-                elif dst_matrix[i][j] < min_dst:
-                    index_i = i
-                    index_y = j
-                    min_dst = dst_matrix[i][j]
                 else:
-                    pass
+                    hollow_coord.append(dst_circles2[k][:])
+        elif len(dst_circles2) == 5:
+            data = np.array(dst_circles2)
+            idex = np.lexsort([data[:, 0]])
+            sorted_data = data[idex, :]
+            if sorted_data[2][0] - sorted_data[0][0] <= 30:
+                sorted_data1 = sorted_data[0:3]
 
-        for k in range(6):
-            if k == index_y or k == index_i:
-                pass
+                idex1 = np.lexsort([sorted_data1[:, 1]])
+                sorted_data2 = sorted_data1[idex1, :]
+                to_del = sorted_data2[1]
+
+                for i in dst_circles2[:]:
+                    if i[0] == to_del[0] and i[1] == to_del[1] and i[2] == to_del[2]:
+                        pass
+                    else:
+                        dst_circles3.append(i[:])
+                hollow_coord = dst_circles3[:]
+            elif sorted_data[2][0]-sorted_data[1][0] <= 20 and sorted_data[4][0] - sorted_data[3][0] <= 20:
+                for i in dst_circles2[1:]:
+                    dst_circles3.append(i[:])
+                hollow_coord = dst_circles3[:]
             else:
-                hollow_coord.append(dst_circles2[k][:])
+                print("ERROR")
+        elif len(dst_circles2) == 4:
+            for i in dst_circles2[:]:
+                hollow_coord.append(i[:])
+        else:
+            print("ERROR")
+        return hollow_coord
 
-    else:
-        print("ERROR")
-
-
-    return hollow_coord
 
 def detect_RGB_circle(cimage):
     hollow_coord = []
@@ -102,7 +108,8 @@ def detect_RGB_circle(cimage):
 
     dst_circles2 = []
     if len(dst_circles1) == 4:
-        dst_circles2 = dst_circles1
+        hollow_coord = dst_circles1
+        return hollow_coord
     else:
         for i in range(len(dst_circles1)):
             if dst_circles1[i][0] >= 500 and dst_circles1[i][1] >= 500 and dst_circles1[i][1] <= cimage.shape[0] * 0.9 and dst_circles1[i][0] <= cimage.shape[1] * 0.9:
@@ -110,54 +117,59 @@ def detect_RGB_circle(cimage):
             else:
                 pass
 
-    if len(dst_circles2) == 5:
-        dst_circles3 = []
-        data = np.array(dst_circles2)
-        idex = np.lexsort([data[:, 0]])
-        sorted_data = data[idex, :]
-        sorted_data1 = sorted_data[0:3]
+        if len(dst_circles2) == 6:
+            arr_dst_circles2 = np.array(dst_circles2)
+            dst_matrix = spatial.distance_matrix(arr_dst_circles2, arr_dst_circles2)
+            min_dst = 99999
+            index_i = 0
+            index_y = 0
+            for i in range(dst_matrix.shape[0]):
+                for j in range(dst_matrix.shape[1]):
+                    if dst_matrix[i][j] == 0:
+                        pass
+                    elif dst_matrix[i][j] < min_dst:
+                        index_i = i
+                        index_y = j
+                        min_dst = dst_matrix[i][j]
+                    else:
+                        pass
 
-        idex1 = np.lexsort([sorted_data1[:, 1]])
-        sorted_data2 = sorted_data1[idex1, :]
-        to_del = sorted_data2[1]
-
-        for i in dst_circles2[:]:
-            if i[0] == to_del[0] and i[1] == to_del[1] and i[2] == to_del[2]:
-                pass
-            else:
-                dst_circles3.append(i[:])
-        hollow_coord = dst_circles3
-    elif len(dst_circles2) == 6:
-        arr_dst_circles2 = np.array(dst_circles2)
-        dst_matrix = spatial.distance_matrix(arr_dst_circles2, arr_dst_circles2)
-        min_dst = 99999
-        index_i = 0
-        index_y = 0
-        for i in range(dst_matrix.shape[0]):
-            for j in range(dst_matrix.shape[1]):
-                if dst_matrix[i][j] == 0:
+            for k in range(6):
+                if k == index_y or k == index_i:
                     pass
-                elif dst_matrix[i][j] < min_dst:
-                    index_i = i
-                    index_y = j
-                    min_dst = dst_matrix[i][j]
                 else:
-                    pass
+                    hollow_coord.append(dst_circles2[k][:])
+        elif len(dst_circles2) == 5:
+            dst_circles3 = []
+            data = np.array(dst_circles2)
+            idex = np.lexsort([data[:, 0]])
+            sorted_data = data[idex, :]
+            if sorted_data[2][0] - sorted_data[0][0] <= 30:
+                sorted_data1 = sorted_data[0:3]
 
-        for k in range(6):
-            if k == index_y or k == index_i:
-                pass
+                idex1 = np.lexsort([sorted_data1[:, 1]])
+                sorted_data2 = sorted_data1[idex1, :]
+                to_del = sorted_data2[1]
+
+                for i in dst_circles2[:]:
+                    if i[0] == to_del[0] and i[1] == to_del[1] and i[2] == to_del[2]:
+                        pass
+                    else:
+                        dst_circles3.append(i[:])
+                hollow_coord = dst_circles3[:]
+            elif sorted_data[2][0] - sorted_data[1][0] <= 20 and sorted_data[4][0] - sorted_data[3][0] <= 20:
+                for i in dst_circles2[1:]:
+                    dst_circles3.append(i[:])
+                hollow_coord = dst_circles3[:]
             else:
-                hollow_coord.append(dst_circles2[k][:])
+                print("ERROR")
+        elif len(dst_circles2) == 4:
+            for i in dst_circles2[:]:
+                hollow_coord.append(i[:])
+        else:
+            print("ERROR")
 
-    elif len(dst_circles2) == 4:
-        for i in dst_circles2[:]:
-            hollow_coord.append(i[:])
-
-    else:
-        print("ERROR")
-
-    return hollow_coord
+        return hollow_coord
 
 def sort_coord(coordinate):
     coordinate_data = np.array(coordinate)
